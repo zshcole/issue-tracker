@@ -13,7 +13,7 @@ export default async function MarketingLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-gray-200 dark:border-dark-border-subtle dark:bg-dark-base">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <div className="container mx-auto flex h-18 items-center justify-between px-4">
           <div className="flex items-center gap-8">
             <Link href="/" className="text-xl font-bold">
               Pulse
@@ -64,7 +64,7 @@ export default async function MarketingLayout({
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
             <div>
-              <h3 className="text-lg font-semibold mb-4">Mode</h3>
+              <h3 className="text-lg font-semibold mb-4">Pulse</h3>
               <p className="text-sm text-gray-600">
                 A modern project management tool built with Next.js.
               </p>
