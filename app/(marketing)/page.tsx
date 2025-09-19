@@ -28,10 +28,10 @@ export default async function LandingPage() {
       </main>
 
       <footer className="border-t border-gray-200 dark:border-dark-border-subtle">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="mx-auto px-4 sm:px-6 py-8">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             <p>
-              © <Timestamp /> Mode. Built for Next.js.
+              © <Timestamp /> Pulse. All rights reserved.
             </p>
           </div>
         </div>
