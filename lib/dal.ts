@@ -25,3 +25,5 @@
 //     return null
 //   }
 // })
+
+export const getUserByEmail = () => {}

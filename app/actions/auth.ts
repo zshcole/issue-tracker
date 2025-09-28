@@ -2,6 +2,7 @@
 
 import * as z from 'zod'
 import { redirect } from 'next/navigation'
+import { getUserByEmail } from '@/lib/dal'
 
 // Define zod schema validation
 const SignInSchema = z.object({
@@ -34,7 +35,7 @@ export type ActionResponse = {
  * @param {FormData} formData - The form data containing 'email' and 'password' fields.
  * @returns {Promise<ActionResponse>} - The result of the sign-in attempt, including success status, message, and errors if any.
  */
-export async function signin(formData: FormData): Promise<ActionResponse> {
+export async function signIn(formData: FormData): Promise<ActionResponse> {
     try {
             const data = {
                 email: formData.get('email') as string,
@@ -100,9 +101,9 @@ export async function signin(formData: FormData): Promise<ActionResponse> {
 export async function signUp(formData: FormData): Promise<ActionResponse> {
     try {
             const data = {
-            email: formData.get('email') as string,
-            password: formData.get('password') as string,
-            confirmPassword: formData.get('confirmPassword') as string,
+                email: formData.get('email') as string,
+                password: formData.get('password') as string,
+                confirmPassword: formData.get('confirmPassword') as string,
             }
 
             // Validate with Zod
