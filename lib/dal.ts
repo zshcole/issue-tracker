@@ -3,6 +3,8 @@
 //   const session = await getSession()
 //   if (!session) return null
 
+import { getSession } from "./auth"
+
 //   // Skip database query during prerendering if we don't have a session
 //   // hack until we have PPR https://nextjs.org/docs/app/building-your-application/rendering/partial-prerendering
 //   if (
@@ -26,4 +28,9 @@
 //   }
 // })
 
-export const getUserByEmail = () => {}
+export const getUserByEmail = async () => {
+    const session = await getSession()
+    if (!session) { 
+        return null;
+    }
+}
