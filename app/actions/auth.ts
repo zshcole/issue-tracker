@@ -2,13 +2,17 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/db/utils/client'
-import { getUserByEmail } from '@/lib/dal'
 
 export type ActionResponse = {
     success: boolean;
     message: string;
     errors?: Record<string, string[]>;
     error?: string;
+}
+
+interface FormData {
+    email: string;
+    password: string;
 }
 
 /**
@@ -18,13 +22,12 @@ export type ActionResponse = {
  * @param {FormData} data - The form data containing 'email' and 'password' fields.
  * @returns {Promise<ActionResponse>} - The result of the sign-in attempt, including success status, message, and errors if any.
  */
-export async function signIn(formData: FormData): Promise<ActionResponse> {
+export async function signIn(data: FormData): Promise<ActionResponse> {
     const supabase = await createClient()
     try {
-
         const { data: { user }, error } = await supabase.auth.signInWithPassword({
-            email: formData.get('email') as string,
-            password: formData.get('password') as string
+            email: data.email,
+            password: data.password
         })
 
         if (!user) {
@@ -32,7 +35,7 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
                 success: false,
                 message: 'Invalid email or password',
                 errors: {
-                    email: ['Invalid email or password']
+                    email: [error?.message ?? 'Unknown error']
                 }
             }
         }
@@ -58,12 +61,12 @@ export async function signIn(formData: FormData): Promise<ActionResponse> {
  * @param {FormData} formData - The form data containing 'email', 'password', and 'confirmPassword' fields.
  * @returns {Promise<ActionResponse>} - The result of the sign-up attempt, including success status, message, and errors if any.
  */
-export async function signUp(formData: FormData): Promise<ActionResponse> {
+export async function signUp(data: FormData): Promise<ActionResponse> {
     const supabase = await createClient()
     try {
             const {data: user, error } = await supabase.auth.signUp({
-                email: formData.get('email') as string,
-                password: formData.get('password') as string
+                email: data.email,
+                password: data.password
             })
 
             if (error) {
@@ -73,7 +76,7 @@ export async function signUp(formData: FormData): Promise<ActionResponse> {
                         success: false,
                         message: 'User with this email already exists',
                         errors: {
-                            email: ['User with this email already exists'],
+                            email: [error?.message ?? 'User with this email already exists'],
                         },
                     }
                 }
@@ -85,12 +88,19 @@ export async function signUp(formData: FormData): Promise<ActionResponse> {
                 }
             }
 
+            if (user) {
+                supabase.from('users').insert({
+                    email: data.email,
+                    password: data.password
+                })
+            }
+
             // Create session for the newly registered user
             await createSession(user.id)
 
             return {
-            success: true,
-            message: 'Account created successfully',
+                success: true,
+                message: 'Account created successfully',
             }
 
     } catch (error) {
