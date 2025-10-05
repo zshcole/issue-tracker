@@ -2,17 +2,14 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/db/utils/client'
+import { FormData } from '@/lib/interface'
+const supabase = createClient()
 
 export type ActionResponse = {
     success: boolean;
     message: string;
     errors?: Record<string, string[]>;
     error?: string;
-}
-
-interface FormData {
-    email: string;
-    password: string;
 }
 
 /**
@@ -23,7 +20,6 @@ interface FormData {
  * @returns {Promise<ActionResponse>} - The result of the sign-in attempt, including success status, message, and errors if any.
  */
 export async function signIn(data: FormData): Promise<ActionResponse> {
-    const supabase = await createClient()
     try {
         const { data: { user }, error } = await supabase.auth.signInWithPassword({
             email: data.email,
@@ -58,16 +54,22 @@ export async function signIn(data: FormData): Promise<ActionResponse> {
  * Handles user registration by validating input, checking for existing users, creating a new user,
  * and starting a session. Returns a structured response indicating success or failure.
  *
- * @param {FormData} formData - The form data containing 'email', 'password', and 'confirmPassword' fields.
+ * @param {FormData} formData - The form data containing 'email' and 'password' fields.
  * @returns {Promise<ActionResponse>} - The result of the sign-up attempt, including success status, message, and errors if any.
  */
 export async function signUp(data: FormData): Promise<ActionResponse> {
-    const supabase = await createClient()
     try {
             const {data: user, error } = await supabase.auth.signUp({
                 email: data.email,
                 password: data.password
             })
+
+            if (user) {
+                supabase.from('users').insert({
+                    email: data.email,
+                    password: data.password
+                })
+            }
 
             if (error) {
                 // Check for duplicate email error (Supabase returns a specific message/code)
@@ -87,16 +89,6 @@ export async function signUp(data: FormData): Promise<ActionResponse> {
                     error: error.message,
                 }
             }
-
-            if (user) {
-                supabase.from('users').insert({
-                    email: data.email,
-                    password: data.password
-                })
-            }
-
-            // Create session for the newly registered user
-            await createSession(user.id)
 
             return {
                 success: true,
@@ -121,11 +113,15 @@ export async function signUp(data: FormData): Promise<ActionResponse> {
  */
 export async function signOut(): Promise<void> {
     try {
-        await deleteSession()
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Supabase sign out error:', error.message);
+            throw new Error('Failed to sign out: ' + error.message);
+        }
     } catch (error) {
-        console.error('Sign out error:', error)
-        throw new Error('Failed to sign out')
+        console.error('Sign out error:', error);
+        throw new Error('Failed to sign out');
     } finally {
-        redirect('/signin')
+        redirect('/signin');
     }
 }
