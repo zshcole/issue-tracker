@@ -3,7 +3,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/db/utils/client'
 import { FormData } from '@/lib/interface'
-const supabase = createClient()
 
 export type ActionResponse = {
     success: boolean;
@@ -20,6 +19,7 @@ export type ActionResponse = {
  * @returns {Promise<ActionResponse>} - The result of the sign-in attempt, including success status, message, and errors if any.
  */
 export async function signIn(data: FormData): Promise<ActionResponse> {
+    const supabase = createClient()
     try {
         const { data: { user }, error } = await supabase.auth.signInWithPassword({
             email: data.email,
@@ -58,6 +58,7 @@ export async function signIn(data: FormData): Promise<ActionResponse> {
  * @returns {Promise<ActionResponse>} - The result of the sign-up attempt, including success status, message, and errors if any.
  */
 export async function signUp(data: FormData): Promise<ActionResponse> {
+    const supabase = createClient()
     try {
             const {data: user, error } = await supabase.auth.signUp({
                 email: data.email,
