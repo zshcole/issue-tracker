@@ -29,13 +29,10 @@ export default function SignUpPage() {
   >(async (prevState: ActionResponse, formData: FormData) => {
     try {
       const result = await signUp(formData)
-
-      // Handle successful submission
       if (result.success) {
         toast.success('Account created successfully')
         router.push('/dashboard')
       }
-
       return result
     } catch (err) {
       return {
@@ -45,6 +42,14 @@ export default function SignUpPage() {
       }
     }
   }, initialState)
+
+  const handleSubmit = async (formData: globalThis.FormData) => {
+    const data: FormData = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+    }
+    await formAction(data)
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50 dark:bg-[#121212]">
@@ -57,7 +62,7 @@ export default function SignUpPage() {
         </h2>
       </div>
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Form action={formAction} className="space-y-6">
+        <Form action={handleSubmit} className="space-y-6">
           {state?.message && !state.success && (
             <FormError>{state.message}</FormError>
           )}
@@ -99,26 +104,6 @@ export default function SignUpPage() {
               </p>
             )}
           </FormGroup>
-
-          <FormGroup>
-            <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
-            <FormInput
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              disabled={isPending}
-              aria-describedby="confirmPassword-error"
-              className={state?.errors?.confirmPassword ? 'border-red-500' : ''}
-            />
-            {state?.errors?.confirmPassword && (
-              <p id="confirmPassword-error" className="text-sm text-red-500">
-                {state.errors.confirmPassword[0]}
-              </p>
-            )}
-          </FormGroup>
-
           <div>
             <Button type="submit" className="w-full" isLoading={isPending}>
               Sign up
