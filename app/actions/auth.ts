@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { createClient } from '@/db/utils/client'
+import { createClient } from '@/app/utils/supabase/server'
 import { FormData } from '@/lib/interface'
 
 export type ActionResponse = {
@@ -19,7 +19,7 @@ export type ActionResponse = {
  * @returns {Promise<ActionResponse>} - The result of the sign-in attempt, including success status, message, and errors if any.
  */
 export async function signIn(data: FormData): Promise<ActionResponse> {
-    const supabase = createClient()
+    const supabase = await createClient()
     try {
         const { data: { user }, error } = await supabase.auth.signInWithPassword({
             email: data.email,
@@ -58,7 +58,7 @@ export async function signIn(data: FormData): Promise<ActionResponse> {
  * @returns {Promise<ActionResponse>} - The result of the sign-up attempt, including success status, message, and errors if any.
  */
 export async function signUp(data: FormData): Promise<ActionResponse> {
-    const supabase = createClient()
+    const supabase = await createClient()
     try {
             const {data: user, error } = await supabase.auth.signUp({
                 email: data.email,
@@ -66,7 +66,7 @@ export async function signUp(data: FormData): Promise<ActionResponse> {
             })
 
             if (user) {
-                supabase.from('users').insert({
+                await supabase.from('users').insert({
                     email: data.email,
                     password: data.password
                 })
@@ -113,6 +113,7 @@ export async function signUp(data: FormData): Promise<ActionResponse> {
  * @returns {Promise<void>} - Resolves when sign-out and redirect are complete.
  */
 export async function signOut(): Promise<void> {
+    const supabase = await createClient()
     try {
         const { error } = await supabase.auth.signOut();
         if (error) {
