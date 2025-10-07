@@ -1,38 +1,43 @@
 import { createClient } from '@/app/utils/supabase/client';
 
 // Get user
-export const getUser = cache(async () => {
-const supabase = createClient();
+export async function getUser(id: number) {
+  const supabase = createClient();
   try {
-    const data = await db.query.users.findMany({
-      where: eq(users.id, session.userId),
-      // Explicitly return the columns you need rather than the whole user object
-      columns: {
-        id: true,
-        name: true,
-        email: true,
-      },
-    })
- 
-    const user = data[0]
- 
-    return user
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, name, email')
+      .eq('id', id)
+      .single();
+    if (error) {
+      console.error(`Failed to fetch user with id ${id}:`, error.message || error);
+      return null;
+    }
+    return data;
   } catch (error) {
-    console.log('Failed to fetch user')
-    return null
+    console.error(`Unexpected error fetching user with id ${id}:`, error);
+    return null;
   }
-})
+}
 
 // Get user by email
 export async function getUserByEmail(email: string) {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('email', email)
-    .single();
-  if (error) throw error;
-  return data;
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+    if (error) {
+      console.error(`Failed to fetch user with email ${email}:`, error.message || error);
+      return null;
+    }
+    return data;
+  } catch (error) {
+    console.error(`Unexpected error fetching user with email ${email}:`, error);
+    return null;
+  }
 }
 
 // Get current user (from auth session)
