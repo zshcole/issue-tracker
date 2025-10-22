@@ -1,8 +1,12 @@
 import type { Logger } from 'pino'
+import { Registry, collectDefaultMetrics } from 'prom-client'
 
 declare global {
     // var usage is required for a global declaration
-    var logger: Logger | undefined
+    var logger: Logger | undefined;
+    var metrics: {
+        registry: Registry;
+    } | undefined
 }
 export async function register() {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
@@ -17,5 +21,13 @@ export async function register() {
         })
         const logger = pino(transport)
         globalThis.logger = logger
+
+        const prometheusRegistry = new Registry()
+        collectDefaultMetrics({
+            register: prometheusRegistry
+        })
+        globalThis.metrics = { 
+            registry: prometheusRegistry
+        }
     }
 }
