@@ -12,7 +12,7 @@ import {
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { signUp, ActionResponse } from '@/app/actions/auth'
-import { FormData } from '@/lib/interface'
+import { FormData } from '@/lib/types'
 
 const initialState: ActionResponse = {
   success: false,
