@@ -1,11 +1,11 @@
 export async function GET() {
   try {
-    globalThis.metrics?.userSignups.inc({
+    globalThis.metrics?.registeredUser.inc({
       plan_type: "free",
       referral_source: "direct"
     });
 
-    return Response.json({
+    return Response.json({  
       message: 'User signup recorded successfully'
     });
   } catch (error) {
