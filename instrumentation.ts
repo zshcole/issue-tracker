@@ -30,7 +30,6 @@ export async function register() {
             register: prometheusRegistry
         })
 
-        // track registered users
         const registeredUserMetric = new Counter({
             name: 'user_signups_total',
             help: 'Total number of users registered',
